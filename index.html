@@ -189,7 +189,7 @@
         statusBar.innerText = 'Memuat data dari Google Sheets Vendor...';
 
         try {
-            const response = await fetch(csvUrl);
+            const response = await fetch(cfgUrl);
             const csvText = await response.text();
             
             const rows = csvText.split(/\r?\n/);
