@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cek Link, No Reff & Status Vendor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 30px;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 850px;
+        }
+        h2 { margin-top: 0; color: #333; text-align: center; }
+        .config-box { background: #eef2f7; padding: 12px; border-radius: 6px; margin-bottom: 15px; font-size: 13px; }
+        .config-box input { width: 100%; padding: 6px; margin-top: 4px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 6px; font-weight: bold; color: #555; }
+        textarea {
+            width: 100%; height: 140px; padding: 10px; border: 1px solid #ccc;
+            border-radius: 4px; box-sizing: border-box; font-family: monospace; font-size: 13px; resize: vertical;
+        }
+        .btn-group { display: flex; gap: 10px; margin-bottom: 15px; }
+        button {
+            padding: 10px 18px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: bold; transition: 0.2s;
+        }
+        .btn-primary { background-color: #007BFF; color: white; flex: 2; }
+        .btn-primary:hover { background-color: #0056b3; }
+        .btn-secondary { background-color: #6c757d; color: white; flex: 1; }
+        .btn-secondary:hover { background-color: #5a6268; }
+        .status-bar { margin-bottom: 15px; padding: 8px 12px; border-radius: 4px; font-size: 13px; display: none; }
+        .status-loading { background: #e2f0ff; color: #0056b3; }
+        .status-success { background: #d4edda; color: #155724; }
+        .error-msg { color: #dc3545; font-weight: bold; text-align: center; margin-top: 15px; display: none; }
+        .group-container { display: flex; flex-direction: column; gap: 20px; }
+        .group-card { background: #f8f9fa; border: 1px solid #dee2e6; border-left: 5px solid #007BFF; border-radius: 6px; padding: 15px; }
+        .group-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #ddd; flex-wrap: wrap; gap: 8px; }
+        .group-title { font-weight: bold; color: #333; font-size: 15px; }
+        .copy-list-btn { background-color: #17a2b8; color: white; border: none; padding: 5px 10px; border-radius: 4px; font-size: 11px; cursor: pointer; font-weight: bold; }
+        .copy-list-btn:hover { background-color: #138496; }
+        .group-list { list-style: none; padding: 0; margin: 0 0 12px 0; display: flex; flex-direction: column; gap: 6px; max-height: 180px; overflow-y: auto; }
+        .group-list li { font-family: monospace; font-size: 12px; background: #fff; padding: 6px 10px; border: 1px solid #e2e8f0; border-radius: 4px; color: #444; display: flex; justify-content: space-between; align-items: center; }
+        .badge { display: inline-block; padding: 2px 6px; border-radius: 3px; font-size: 10px; font-weight: bold; text-transform: uppercase; }
+        .badge-success { background: #28a745; color: white; }
+        .badge-pending { background: #ffc107; color: #333; }
+        .badge-failed { background: #dc3545; color: white; }
+        .badge-suspect { background: #fd7e14; color: white; }
+        .badge-unknown { background: #e2e8f0; color: #666; }
+        .url-box { display: flex; gap: 8px; align-items: center; background: #eef2f7; padding: 8px; border-radius: 4px; flex-wrap: wrap; }
+        .url-box input { flex: 1; min-width: 200px; padding: 6px; font-size: 12px; font-family: monospace; border: 1px solid #ccc; border-radius: 3px; background: #fff; color: #333; }
+        .link-btn { padding: 6px 12px; background-color: #28a745; color: white; text-decoration: none; border-radius: 4px; font-size: 12px; font-weight: bold; white-space: nowrap; }
+        .link-btn:hover { background-color: #218838; }
+        .copy-btn { background-color: #6c757d; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; white-space: nowrap; }
+        .copy-btn:hover { background-color: #5a6268; }
+        .not-found-section { background: #fff5f5; border: 1px solid #feb2b2; padding: 12px; border-radius: 6px; color: #c53030; font-size: 13px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Cek Link & No Reff (Presisi 100%)</h2>
+    
+    <div class="config-box">
+        <label for="csvUrl"><strong>URL Publish CSV Google Sheets Vendor:</strong></label>
+        <input type="text" id="csvUrl" value="https://docs.google.com/spreadsheets/d/e/2PACX-1vSpRLNNFecUqaUOBim3HjrpGrKjyMsJm37hPdHpQ7ijJef2lkMS1b33lrA2L7jKlJBP8A3MCJn_qnDf/pub?output=csv">
+    </div>
+
+    <div class="form-group">
+        <label for="searchReff">Masukkan Daftar Nomor Reff (1 baris = 1 nomor / gabung):</label>
+        <textarea id="searchReff" placeholder="Tempel banyak nomor reff di sini..."></textarea>
+    </div>
+    
+    <div class="btn-group">
+        <button class="btn-primary" onclick="cariReff()">Proses & Kelompokkan</button>
+        <button class="btn-secondary" onclick="syncVendorSheet()">Fetch Sheet Vendor</button>
+    </div>
+
+    <div id="statusBar" class="status-bar"></div>
+    <div id="errorMsg" class="error-msg"></div>
+    <div id="resultsContainer" class="group-container"></div>
+</div>
+
+<script>
+    const urlMapping = {
+        "BL1": "https://billing1.2acquire.com/@admin7889",
+        "BL2": "https://billing2.2acquire.com/@admin7889",
+        "BL4": "https://billing4.2acquire.com/@admin7889",
+        "BL7": "https://billing6.2acquire.com/@admin7889",
+        "BL8": "https://billing8.2acquire.com/@admin7889",
+        "BL9": "https://billing9.2acquire.com/@admin7889",
+        "IV8": "https://inv8.bydana.click/@admin7889",
+        "IVE": "https://inv13.2acquire.com/@admin7889",
+        "IV1": "https://inv1.2acquire.com/@admin7889",
+        "IV6": "https://inv6.2acquire.com/@admin7889",
+        "IV7": "https://inv7.2acquire.com/@admin7889",
+        "IV9": "https://inv9.danabebas.click/@admin7889",
+        "IVC": "https://inv11.danabebas.click/@admin7889",
+        "TO4": "https://topup4.2acquire.com/@admin7889",
+        "TO3": "https://topup3.2acquire.com/@admin7889",
+        "TO2": "https://topup2.2acquire.com/@admin7889",
+        "TO1": "https://topup1.2acquire.com/@admin7889",
+        "TO5": "https://topup5.2acquire.com/@admin7889",
+        "TO6": "https://topup5.2acquire.com/@admin7889",
+        "SV7": "https://service7.1velocity.biz/@admin7889",
+        "SV2": "https://service2.1velocity.biz/@admin7889",
+        "SV3": "https://service3.1velocity.biz/@admin7889",
+        "SV4": "https://service4.1velocity.biz/@admin7889",
+        "SV5": "https://service5.1velocity.biz/@admin7889",
+        "SV6": "https://service6.1velocity.biz/@admin7889",
+        "SC2": "https://secure2.1velocity.biz/@admin7889",
+        "SC4": "https://secur4.1velocity.biz/@admin7889",
+        "SC5": "https://secure5.1velocity.biz/@admin7889",
+        "SC6": "https://secure6.1velocity.biz/@admin7889",
+        "SC8": "https://secure8.1velocity.biz/@admin7889",
+        "SC9": "https://secure9.1velocity.biz/@admin7889",
+        "SCA": "https://secure10.1velocity.biz/@admin7889",
+        "SCB": "https://secure11.1velocity.biz/@admin7889",
+        "SCC": "https://secure12.1velocity.biz/@admin7889",
+        "SCD": "https://secure13.1velocity.biz/@admin7889",
+        "SCF": "https://secure14.1velocity.biz/@admin7889",
+        "SCG": "https://secure15.1velocity.biz/@admin7889",
+        "SCH": "https://secure16.1velocity.biz/@admin7889",
+        "SCI": "https://secure17.1velocity.biz/@admin7889",
+        "SCJ": "https://secure18.1velocity.biz/@admin7889",
+        "ORD": "https://order12.1velocity.biz/@admin7889",
+        "OR1": "https://order1.1velocity.biz/@admin7889",
+        "OR2": "https://order2.1velocity.biz/@admin7889",
+        "OR4": "https://order4.1velocity.biz/@admin7889",
+        "OR6": "https://order6.1velocity.biz/@admin7889",
+        "OR8": "https://order8.1velocity.biz/@admin7889",
+        "ORB": "https://order10.1velocity.biz/@admin7889",
+        "ORC": "https://order11.1velocity.biz/@admin7889",
+        "ORE": "https://order13.1velocity.biz/@admin7889",
+        "PY4": "https://payment4.1velocity.biz/@admin7889",
+        "PY1": "https://payment1.1velocity.biz/@admin7889",
+        "PY2": "https://payment2.1velocity.biz/@admin7889",
+        "PY5": "https://payment5.1velocity.biz/@admin7889",
+        "PY6": "https://payment6.1velocity.biz/@admin7889",
+        "PY7": "https://payment7.1velocity.biz/@admin7889",
+        "PYA": "https://payment21.1velocity.biz/@admin7889",
+        "CK8": "https://checkout8.1velocity.biz/@admin7889",
+        "CK1": "https://checkout1.1velocity.biz/@admin7889",
+        "CK2": "https://checkout2.1velocity.biz/@admin7889",
+        "CK4": "https://checkout4.1velocity.biz/@admin7889",
+        "CK5": "https://checkout5.1velocity.biz/@admin7889",
+        "CK6": "https://checkout6.1velocity.biz/@admin7889",
+        "CK7": "https://checkout7.1velocity.biz/@admin7889",
+        "ST6": "https://settle6.1velocity.biz/@admin7889",
+        "ST1": "https://settle1.1velocity.biz/@admin7889",
+        "ST2": "https://settle2.1velocity.biz/@admin7889",
+        "ST4": "https://settle4.1velocity.biz/@admin7889",
+        "ST5": "https://settle5.1velocity.biz/@admin7889",
+        "ST7": "https://settle7.1velocity.biz/@admin7889",
+        "ST8": "https://settle8.1velocity.biz/@admin7889",
+        "FD1": "https://fund1.1velocity.biz/@admin7889",
+        "FD2": "https://fund2.1velocity.biz/@admin7889",
+        "FD3": "https://fund3.1velocity.biz/@admin7889",
+        "PR1": "https://price1.1velocity.biz/@admin7889",
+        "PR2": "https://price2.1velocity.biz/@admin7889",
+        "PR3": "https://price3.1velocity.biz/@admin7889"
+    };
+
+    let vendorDataMap = new Map();
+
+    async function syncVendorSheet() {
+        const csvUrl = document.getElementById('csvUrl').value.trim();
+        const statusBar = document.getElementById('statusBar');
+
+        if (!csvUrl) return;
+
+        statusBar.className = 'status-bar status-loading';
+        statusBar.style.display = 'block';
+        statusBar.innerText = 'Memuat data dari Google Sheets Vendor...';
+
+        try {
+            const response = await fetch(csvUrl);
+            const csvText = await response.text();
+            
+            const rows = csvText.split(/\r?\n/);
+            vendorDataMap.clear();
+
+            let delimiter = ',';
+            if (rows[0].includes(';')) delimiter = ';';
+            if (rows[0].includes('\t')) delimiter = '\t';
+
+            for (let i = 0; i < rows.length; i++) {
+                if (!rows[i].trim()) continue;
+                
+                const cols = rows[i].split(delimiter).map(c => c.replace(/^"|"$/g, '').trim());
+                
+                let foundReff = '';
+                let status = 'Unknown';
+                let note = '-';
+
+                // Pemindaian seluruh kolom untuk menemukan nomor Reff & Status
+                for (let c = 0; c < cols.length; c++) {
+                    const val = cols[c];
+                    if (!val) continue;
+                    
+                    const cleanVal = val.toUpperCase().replace(/[^A-Z0-9_]/g, '');
+                    
+                    // Deteksi pola Reff unik
+                    if (cleanVal.length >= 10 && (cleanVal.includes('_') || (/[A-Z]/.test(cleanVal) && /[0-9]/.test(cleanVal)))) {
+                        if (!cleanVal.includes('DISBURSE') && !cleanVal.includes('PROJECT') && !cleanVal.includes('MERCHANT') && !cleanVal.includes('PAYMENT')) {
+                            foundReff = cleanVal;
+                        }
+                    }
+
+                    // Deteksi kata kunci status
+                    const valLower = val.toLowerCase();
+                    if (['failed', 'success', 'pending', 'suspect', 'gagal', 'sukses', 'berhasil'].some(s => valLower.includes(s))) {
+                        status = val;
+                    } else if (val !== '-' && !foundReff.includes(val)) {
+                        note = val;
+                    }
+                }
+
+                if (foundReff) {
+                    vendorDataMap.set(foundReff, { status, note });
+                    
+                    // Simpan variasi key tanpa awalan "TF_"
+                    if (foundReff.startsWith('TF_')) {
+                        vendorDataMap.set(foundReff.replace(/^TF_/, ''), { status, note });
+                    }
+                }
+            }
+
+            console.log("=== HASHMAP BERHASIL DIPERBARUI ===");
+            console.log(`Total Data Reff Terdaftar: ${vendorDataMap.size}`);
+
+            statusBar.className = 'status-bar status-success';
+            statusBar.innerText = `Sinkronisasi Vendor Sukses: ${vendorDataMap.size} Reff terdaftar.`;
+        } catch (err) {
+            statusBar.style.display = 'none';
+            console.error("Error Fetching Sheet:", err);
+        }
+    }
+
+    async function cariReff() {
+        if (vendorDataMap.size === 0) await syncVendorSheet();
+
+        let rawInput = document.getElementById('searchReff').value.trim();
+        let resultsContainer = document.getElementById('resultsContainer');
+        let errorMsg = document.getElementById('errorMsg');
+        
+        resultsContainer.innerHTML = '';
+        errorMsg.style.display = 'none';
+
+        if (rawInput === '') {
+            errorMsg.innerText = 'Mohon masukkan setidaknya satu nomor reff!';
+            errorMsg.style.display = 'block';
+            return;
+        }
+
+        let lines = rawInput.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+        if (lines.length === 1 && lines[0].includes('TF_')) {
+            lines = lines[0].split(/(?=TF_)/);
+        }
+
+        let groupedData = {};
+        let unknownList = [];
+
+        let sortedKeys = Object.keys(urlMapping).sort((a, b) => b.length - a.length);
+
+        lines.forEach(item => {
+            let refText = item.trim();
+            if (!refText) return;
+
+            let matchedKey = null;
+            let foundUrl = null;
+
+            for (let i = 0; i < sortedKeys.length; i++) {
+                let key = sortedKeys[i];
+                let parts = refText.split('_');
+                let targetPart = parts.find(p => p.startsWith(key) || p === key);
+                
+                if (targetPart && targetPart.startsWith(key)) {
+                    matchedKey = key;
+                    foundUrl = urlMapping[key];
+                    break;
+                }
+            }
+
+            if (matchedKey) {
+                if (!groupedData[matchedKey]) {
+                    groupedData[matchedKey] = { url: foundUrl, items: [] };
+                }
+                groupedData[matchedKey].items.push(refText);
+            } else {
+                unknownList.push(refText);
+            }
+        });
+
+        let hasResult = false;
+        for (let code in groupedData) {
+            hasResult = true;
+            let groupObj = groupedData[code];
+
+            let card = document.createElement('div');
+            card.className = 'group-card';
+
+            let header = document.createElement('div');
+            header.className = 'group-header';
+            
+            let title = document.createElement('div');
+            title.className = 'group-title';
+            title.innerText = `Kode Kategori: ${code} (${groupObj.items.length} transaksi)`;
+            header.appendChild(title);
+
+            let copyListBtn = document.createElement('button');
+            copyListBtn.className = 'copy-list-btn';
+            copyListBtn.innerText = 'Salin Semua Reff';
+            copyListBtn.onclick = function() {
+                let allReffText = groupObj.items.join('\n');
+                navigator.clipboard.writeText(allReffText).then(() => {
+                    copyListBtn.innerText = 'Reff Tersalin!';
+                    setTimeout(() => { copyListBtn.innerText = 'Salin Semua Reff'; }, 2000);
+                });
+            };
+            header.appendChild(copyListBtn);
+            card.appendChild(header);
+
+            let ul = document.createElement('ul');
+            ul.className = 'group-list';
+            groupObj.items.forEach(ref => {
+                let li = document.createElement('li');
+                
+                const cleanRefKey = ref.toUpperCase().replace(/[^A-Z0-9_]/g, '');
+                
+                // Pencarian langsung & fleksibel (fuzzy match)
+                let vendorInfo = vendorDataMap.get(cleanRefKey) || 
+                                 vendorDataMap.get(cleanRefKey.replace(/^TF_/, '')) || 
+                                 { status: 'Unknown', note: '-' };
+
+                if (vendorInfo.status === 'Unknown') {
+                    for (let [key, val] of vendorDataMap.entries()) {
+                        if (cleanRefKey.includes(key) || key.includes(cleanRefKey)) {
+                            vendorInfo = val;
+                            break;
+                        }
+                    }
+                }
+
+                let badgeClass = 'badge-unknown';
+                const st = vendorInfo.status.toLowerCase();
+                
+                if (st.includes('success') || st.includes('sukses')) badgeClass = 'badge-success';
+                else if (st.includes('pending')) badgeClass = 'badge-pending';
+                else if (st.includes('fail') || st.includes('gagal')) badgeClass = 'badge-failed';
+                else if (st.includes('suspect')) badgeClass = 'badge-suspect';
+
+                li.innerHTML = `
+                    <span><strong>${ref}</strong></span>
+                    <span>Status: <span class="badge ${badgeClass}">${vendorInfo.status}</span></span>
+                `;
+                ul.appendChild(li);
+            });
+            card.appendChild(ul);
+
+            let urlBox = document.createElement('div');
+            urlBox.className = 'url-box';
+
+            let inputUrl = document.createElement('input');
+            inputUrl.type = 'text';
+            inputUrl.value = groupObj.url;
+            inputUrl.readOnly = true;
+            inputUrl.onclick = function() { this.select(); };
+            urlBox.appendChild(inputUrl);
+
+            let copyBtn = document.createElement('button');
+            copyBtn.className = 'copy-btn';
+            copyBtn.innerText = 'Salin Link';
+            copyBtn.onclick = function() {
+                navigator.clipboard.writeText(groupObj.url).then(() => {
+                    copyBtn.innerText = 'Tersalin!';
+                    setTimeout(() => { copyBtn.innerText = 'Salin Link'; }, 2000);
+                });
+            };
+            urlBox.appendChild(copyBtn);
+
+            let linkBtn = document.createElement('a');
+            linkBtn.className = 'link-btn';
+            linkBtn.href = groupObj.url;
+            linkBtn.target = '_blank';
+            linkBtn.innerText = 'Buka Web';
+            urlBox.appendChild(linkBtn);
+
+            card.appendChild(urlBox);
+            resultsContainer.appendChild(card);
+        }
+
+        if (unknownList.length > 0) {
+            let unknownDiv = document.createElement('div');
+            unknownDiv.className = 'not-found-section';
+            unknownDiv.innerHTML = `<strong>Tidak Dikenali (${unknownList.length}):</strong><br>` + unknownList.join('<br>');
+            resultsContainer.appendChild(unknownDiv);
+            hasResult = true;
+        }
+
+        if (!hasResult) {
+            errorMsg.innerText = 'Tidak ada nomor reff valid yang dapat diproses.';
+            errorMsg.style.display = 'block';
+        }
+    }
+
+    window.onload = syncVendorSheet;
+</script>
+
+</body>
+</html>
