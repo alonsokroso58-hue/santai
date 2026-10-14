@@ -369,9 +369,8 @@
                     }
 
                     const valLower = val.toLowerCase();
-                    if (['failed', 'success', 'pending', 'suspect', 'gagal', 'sukses', 'error', 'batal', 'completed', 'settled', 'lunas', 'proses'].some(s => valLower === s || valLower.includes(s))) {
-    status = val;
-}
+                    if (['failed', 'success', 'pending', 'suspect', 'gagal', 'sukses', 'error', 'batal', 'completed', 'settled'].some(s => valLower === s || valLower.includes(s))) {
+                        status = val;
                     }
                 }
 
