@@ -326,7 +326,8 @@
     }
 
     async function syncVendorSheet(showAlert = false) {
-        const scriptUrl = "https://script.google.com/macros/s/AKfycbxjvn67CC64YXym5ZSJqj67cL5Y8BMadkjsPyrL4jGG_S0_jJMg6ijQwIb9MhZEZxtDsA/exec";
+        // Menggunakan scriptUrl yang benar untuk fetch data
+        const csvUrl = "https://script.google.com/macros/s/AKfycbxjvn67CC64YXym5ZSJqj67cL5Y8BMadkjsPyrL4jGG_S0_jJMg6ijQwIb9MhZEZxtDsA/exec";
         
         const statusBar = document.getElementById('statusBar');
         const errorMsg = document.getElementById('errorMsg');
@@ -338,7 +339,7 @@
 
         try {
             // Tambahkan parameter waktu acak agar GAS / Browser tidak mengambil data dari cache lama
-            const response = await fetch(csvUrl + '&nocache=' + new Date().getTime(), { cache: 'no-store' });
+            const response = await fetch(csvUrl + (csvUrl.includes('?') ? '&' : '?') + 'nocache=' + new Date().getTime(), { cache: 'no-store' });
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             
             const csvText = await response.text();
@@ -359,16 +360,14 @@
                     if (!val) continue;
                     
                     const cleanVal = val.toUpperCase().replace(/[^A-Z0-9_]/g, '');
-                    if (cleanVal.length > 40) continue; // Diperbesar sedikit agar mencakup ref panjang
+                    if (cleanVal.length > 40) continue; 
 
-                    // Deteksi format nomor referensi (biasanya mengandung angka dan huruf minimal 8 karakter)
                     if (cleanVal.length >= 8 && /\d/.test(cleanVal) && /[A-Z]/.test(cleanVal)) {
                         if (!['DISBURSE', 'PROJECT', 'MERCHANT', 'PAYMENT', 'STATUS', 'NOTE', 'SUCCESS', 'FAILED', 'PENDING', 'GAGAL', 'SUKSES', 'REF'].includes(cleanVal)) {
                             if (!foundReff) foundReff = cleanVal;
                         }
                     }
 
-                    // Deteksi status transaksi dengan lebih fleksibel
                     const valLower = val.toLowerCase();
                     if (['failed', 'success', 'pending', 'suspect', 'gagal', 'sukses', 'error', 'batal', 'completed', 'settled'].some(s => valLower === s || valLower.includes(s))) {
                         status = val;
@@ -406,7 +405,6 @@
             return;
         }
 
-        // Otomatis sinkronisasi ulang data terbaru setiap kali tombol Cek diklik
         await syncVendorSheet(false);
 
         const lines = rawInput.split('\n');
