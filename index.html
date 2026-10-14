@@ -338,7 +338,7 @@
 
         try {
             // Tambahkan parameter waktu acak agar GAS / Browser tidak mengambil data dari cache lama
-            const response = await fetch(scriptUrl + '?t=' + new Date().getTime());
+            const response = await fetch(csvUrl + '&nocache=' + new Date().getTime(), { cache: 'no-store' });
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             
             const csvText = await response.text();
