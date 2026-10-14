@@ -1,4 +1,5 @@
-<html>
+<!DOCTYPE html>
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -326,7 +327,7 @@
 
     async function syncVendorSheet(showAlert = false) {
         // Menggunakan scriptUrl yang benar untuk fetch data
-        const csvUrl = "https://script.google.com/macros/s/AKfycbyHHh5rtjzHv01CHCgNF_gCp1hE2MlWT62XzMy9o6zG/dev";
+        const csvUrl = "https://script.google.com/macros/s/AKfycbxjvn67CC64YXym5ZSJqj67cL5Y8BMadkjsPyrL4jGG_S0_jJMg6ijQwIb9MhZEZxtDsA/exec";
         
         const statusBar = document.getElementById('statusBar');
         const errorMsg = document.getElementById('errorMsg');
@@ -368,8 +369,9 @@
                     }
 
                     const valLower = val.toLowerCase();
-                    if (['failed', 'success', 'pending', 'suspect', 'gagal', 'sukses', 'error', 'batal', 'completed', 'settled'].some(s => valLower === s || valLower.includes(s))) {
-                        status = val;
+                    if (['failed', 'success', 'pending', 'suspect', 'gagal', 'sukses', 'error', 'batal', 'completed', 'settled', 'lunas', 'proses'].some(s => valLower === s || valLower.includes(s))) {
+    status = val;
+}
                     }
                 }
 
