@@ -326,7 +326,6 @@
     }
 
     async function syncVendorSheet(showAlert = false) {
-        // Menggunakan scriptUrl yang benar untuk fetch data
         const csvUrl = "https://script.google.com/macros/s/AKfycbxjvn67CC64YXym5ZSJqj67cL5Y8BMadkjsPyrL4jGG_S0_jJMg6ijQwIb9MhZEZxtDsA/exec";
         
         const statusBar = document.getElementById('statusBar');
@@ -338,7 +337,6 @@
         errorMsg.style.display = 'none';
 
         try {
-            // Tambahkan parameter waktu acak agar GAS / Browser tidak mengambil data dari cache lama
             const response = await fetch(csvUrl + (csvUrl.includes('?') ? '&' : '?') + 'nocache=' + new Date().getTime(), { cache: 'no-store' });
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             
@@ -385,9 +383,7 @@
 
             statusBar.className = 'status-bar status-success';
             statusBar.innerText = `Sinkronisasi Berhasil: ${matchedCount} data referensi terbaru dimuat.`;
-            if (showAlert) {
-                alert(`Sinkronisasi berhasil! ${matchedCount} data referensi terbaru telah diperbarui.`);
-            }
+            // Pop up alert telah dihapus di sini
         } catch (err) {
             statusBar.style.display = 'none';
             errorMsg.style.display = 'block';
