@@ -383,7 +383,6 @@
 
             statusBar.className = 'status-bar status-success';
             statusBar.innerText = `Sinkronisasi Berhasil: ${matchedCount} data referensi terbaru dimuat.`;
-            // Pop up alert telah dihapus di sini
         } catch (err) {
             statusBar.style.display = 'none';
             errorMsg.style.display = 'block';
@@ -489,10 +488,9 @@
         }
     }
 
+    // Fungsi salin tetap aktif, namun popup alert dihapus
     function copyTextData(text) {
-        navigator.clipboard.writeText(text).then(() => {
-            alert('Berhasil disalin ke clipboard!');
-        }).catch(err => {
+        navigator.clipboard.writeText(text).catch(err => {
             console.error('Gagal menyalin: ', err);
         });
     }
