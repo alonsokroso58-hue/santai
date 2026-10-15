@@ -333,7 +333,7 @@
 
         statusBar.className = 'status-bar status-loading';
         statusBar.style.display = 'block';
-        statusBar.innerText = 'Mengambil data terbaru dari CSV Vendor...';
+        statusBar.innerText = 'Mengambil data terbaru dari Sheet Vendor...';
         errorMsg.style.display = 'none';
 
         try {
@@ -382,7 +382,7 @@
             }
 
             statusBar.className = 'status-bar status-success';
-            statusBar.innerText = `Sinkronisasi Berhasil: ${matchedCount} data referensi terbaru dimuat.`;
+            statusBar.innerText = `Sinkronisasi Berhasil: ${matchedCount} data referensi terbaru dimuat secara real-time.`;
         } catch (err) {
             statusBar.style.display = 'none';
             errorMsg.style.display = 'block';
@@ -488,7 +488,6 @@
         }
     }
 
-    // Fungsi salin tetap aktif, namun popup alert dihapus
     function copyTextData(text) {
         navigator.clipboard.writeText(text).catch(err => {
             console.error('Gagal menyalin: ', err);
